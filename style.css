@@ -1,0 +1,49 @@
+@import url("https://s3-us-west-1.amazonaws.com/patterns.esri.com/files/calcite-web/1.1.0/css/calcite-web.min.css");
+
+body {
+    background: #efefef;
+}
+
+.cls-1{
+    fill:#bcdaed;
+    stroke:#f0f0f0;
+    stroke-miterlimit:10;
+    cursor: pointer;
+}
+.cls-1:hover{
+    fill:#e4a793;
+}
+.cls-2,.cls-3,.cls-7{font-size:14px;font-family:ArialMT, Arial;}
+.cls-3,.cls-6{letter-spacing:-0.04em;}
+.cls-4{letter-spacing:-0.06em;}
+.cls-5{letter-spacing:-0.02em;}
+.cls-7{letter-spacing:-0.07em;}
+
+.cls-2, 
+.cls-3, 
+.cls-4, 
+.cls-5,
+.cls-6,
+.cls-7 {
+    pointer-events: none;
+    fill: rgba(0,0,0,0.5);
+}
+
+.header-wrap {
+    position: absolute;
+    width: 100%;
+    padding-top: 2rem;
+    text-align: center;
+    pointer-events: none;
+}
+
+.map-wrap {
+    position: relative;
+}
+
+.attribution-info-wrap {
+    
+    /* position: absolute;
+    bottom: 0;
+    right: 0; */
+}
