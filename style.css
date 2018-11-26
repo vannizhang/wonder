@@ -41,6 +41,51 @@ body {
     position: relative;
 }
 
+.info-window-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    padding: 1rem;
+    z-index: 10;
+}
+
+.info-window-wrap.is-right {
+    left: unset;
+    right: 0;
+}
+
+.info-window {
+    height: 100%;
+    /* width: auto; */
+    width: 450px;
+    background: #e4a793;
+    overflow-y: auto;
+}
+
+.info-window-content {
+    padding: .5rem 1rem;
+}
+
+@media screen and (max-width: 960px) {
+
+    .info-window-wrap{
+        position: relative;
+        top: unset;
+        left: unset;
+        bottom: unset;
+        padding: 0 1rem 1rem;
+        /* width: 100%; */
+    }
+
+    .info-window {
+        height: auto;
+        width: 100%;
+        /* background: #e4a793; */
+    }
+}
+
+
 .attribution-info-wrap {
     
     /* position: absolute;
