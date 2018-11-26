@@ -147,11 +147,14 @@ const SvgMap = function(){
                 const target = e.currentTarget;
                 const x = e.clientX;
                 const stateID = target.getAttribute('id');
+                target.classList.add('is-active');
                 controller.showInfoPanel(stateID, x);
                 // console.log(x);
             });
 
             polygon.addEventListener('mouseout', function(e) {
+                const target = e.currentTarget;
+                target.classList.remove('is-active');
                 controller.hideInfoPanel();
                 // console.log('mouse out');
             });
