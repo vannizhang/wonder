@@ -91,13 +91,24 @@ const Controller = function(infoWindow){
         return googleAutoCompleteData[stateName];
     };
 
-    const showInfoPanel = function(stateID, clientX){
-        const data = getDataByStateID(stateID);
-        infoWindow.show(data, clientX);
+    const showInfoPanel = function(stateID, clientX, enforceToShow){
+        // if enforce to show is ture, then ignore the infoWindow.isSticky state and just show the info window anyway
+        const shouldShow = typeof enforceToShow === 'boolean' && enforceToShow ? true : !infoWindow.isSticky();
+        if(shouldShow){
+            const data = getDataByStateID(stateID);
+            infoWindow.show(data, clientX);
+        }
     };
 
-    const hideInfoPanel  = function(){
-        infoWindow.hide();
+    const hideInfoPanel = function(){
+        // // hide if it's not sticky
+        if( !infoWindow.isSticky() ){
+            infoWindow.hide();
+        }
+    };
+
+    const toggleStickInfoPanel = function(isSticky){
+        infoWindow.toggleIsSticky(isSticky);
     };
 
     const getJson = function(url, callback){
@@ -126,43 +137,77 @@ const Controller = function(infoWindow){
     return {
         loadData: loadData,
         showInfoPanel: showInfoPanel,
-        hideInfoPanel: hideInfoPanel
+        hideInfoPanel: hideInfoPanel,
+        toggleStickInfoPanel: toggleStickInfoPanel
     };
 
 };
 
 const SvgMap = function(){
 
-    const $polygons = document.querySelectorAll('polygon');
+    let controller = null;
 
+    const $polygons = document.querySelectorAll('polygon');
+    
     const init = function(appController){
-        initEventHandler(appController);
+        controller = appController;
+        initEventHandler();
     };
 
-    const initEventHandler = function(controller){
+    const initEventHandler = function(){
 
         $polygons.forEach(function(polygon){
 
             polygon.addEventListener('mouseover', function(e) {
-                const target = e.currentTarget;
-                const x = e.clientX;
-                const stateID = target.getAttribute('id');
-                target.classList.add('is-active');
-                controller.showInfoPanel(stateID, x);
-                // console.log(x);
+                triggerShowInfoWindowEvt(e);
             });
 
             polygon.addEventListener('mouseout', function(e) {
+                triggerShowInfoWindowEvt();
+            });
+
+            polygon.addEventListener('click', function(e) {
                 const target = e.currentTarget;
-                target.classList.remove('is-active');
-                controller.hideInfoPanel();
-                // console.log('mouse out');
+                toggleActiveHexPolygon(target);
+                triggerShowInfoWindowEvt(e);
             });
         })
     };
 
+    const triggerShowInfoWindowEvt = function(e){
+        if(e){
+            const target = e.currentTarget;
+            const x = e.clientX;
+            const stateID = target.getAttribute('id');
+            const enforceToShow = e.type === 'click' ? true : false;
+            controller.showInfoPanel(stateID, x, enforceToShow);
+        } else {
+            controller.hideInfoPanel();
+        }
+    };
+
+    const toggleActiveHexPolygon = function(element){
+        const isAlreadyActive = element ? element.classList.contains('is-active') : false;
+        const elementToSetAsActive = element && !isAlreadyActive ? element : null;
+        const isInfoWindowSticky = elementToSetAsActive ? true : false;
+
+        setActiveHexPolygon(elementToSetAsActive);
+        controller.toggleStickInfoPanel(isInfoWindowSticky);
+    };
+
+    const setActiveHexPolygon = function(element){
+        $polygons.forEach(function(polygon){
+            if(polygon === element){
+                polygon.classList.add('is-active');
+            } else {
+                polygon.classList.remove('is-active');
+            }
+        });
+    }
+
     return {
-        init: init
+        init: init,
+        setActiveHexPolygon: setActiveHexPolygon
     };
 };
 
@@ -170,7 +215,10 @@ const InfoWindow = function(options){
 
     options = options || {};
 
+    let isInfoWindowSticky = false;
+
     const $container = options.container ? document.getElementById(options.container) : null;
+    const infoWindowOnCloseHandler = options.infoWindowOnCloseHandler || null;
 
     const init = function(){
         if(!$container){
@@ -178,6 +226,31 @@ const InfoWindow = function(options){
             return;
         }
     };
+
+    const initEventHandler = function(){
+
+        document.querySelectorAll('.js-open-link').forEach(function(element){
+            element.addEventListener('click', function (event) {
+                openGoogleSearchPage(event.target.innerHTML);
+            });
+        });
+
+        document.querySelectorAll('.js-close-panel').forEach(function(element){
+            element.addEventListener('click', function (event) {
+                hide();
+                toggleIsSticky(false);
+                if(infoWindowOnCloseHandler){
+                    infoWindowOnCloseHandler();
+                }
+            });
+        });
+    };
+
+    const openGoogleSearchPage = function(q){
+        q = q.replace(/\s/g, '+');
+        const url = 'https://www.google.com/search?q=' + q;
+        window.open(url, '_blank');
+    }
 
     const show = function(data, clientX){
         render(data);
@@ -190,6 +263,15 @@ const InfoWindow = function(options){
         $container.classList.add('hide');
     };
 
+    const isSticky = function(){
+        return isInfoWindowSticky;
+    };
+
+    const toggleIsSticky = function(isSticky){
+        isSticky = typeof isSticky === 'boolean' ? isSticky : !isInfoWindowSticky;
+        isInfoWindowSticky = isSticky;
+    }
+
     const setPosition = function(clientX){
         const windowMidPoint = window.innerWidth / 2;
         const isRight = clientX <= windowMidPoint ? true : false;
@@ -199,34 +281,37 @@ const InfoWindow = function(options){
         } else {
             $container.classList.remove('is-right');
         }
-
-        // console.log(clientX, window.innerWidth);
     };
 
     const render = function(data){
         const infoWindowHtml = data ? getContentHtml(data) : '';
         $container.innerHTML = infoWindowHtml;
+        initEventHandler();
     };
 
     const getContentHtml = function(data){
 
-        const contentHtml = data.map(function(d){
+        const contentHtml = data.map(function(d, i){
 
             const sectionHtml = d.autocompletes.map(function(q){
-                return '<p class="font-size--3 trailer-0">' + q + '</p>';
+                return '<p class="font-size--2 trailer-0 js-open-link cursor-pointer">' + q + '</p>';
             }).join('');
 
-            return '<div class="info-window-content">'+sectionHtml+'</div>';
+            const isBorderVisible = i === 1 ? 'is-middle-section' : '';
+
+            return '<div class="info-window-content ' + isBorderVisible + '">'+sectionHtml+'</div>';
 
         }).join('');
 
-        return '<div class="info-window">' + contentHtml + '</div>';
+        return '<div class="info-window"><div class="text-right leader-half"><span class="icon-ui-close margin-right-half cursor-pointer js-close-panel"></span></div>' + contentHtml + '</div>';
     };
 
     return {
         init: init,
         show: show,
-        hide: hide
+        hide: hide,
+        toggleIsSticky: toggleIsSticky,
+        isSticky: isSticky
     };
 };
 
@@ -236,7 +321,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const svgMap = new SvgMap();
     
     const infoWindow = new InfoWindow({
-        container: 'infoWindowDiv'
+        container: 'infoWindowDiv',
+        infoWindowOnCloseHandler: function(){
+            svgMap.setActiveHexPolygon(null);
+        }
     });
     
     const appController = new Controller(infoWindow);
