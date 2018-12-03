@@ -3,7 +3,7 @@
 
 const Config = {
     "URL_GET_GOOGLE_AUTOCOMPLETE_DATA": "https://wonder.vannizhang.com/getData",
-    "URL_QUERY": "https://api.vannizhang.com/",
+    "URL_QUERY": "https://api.vannizhang.com",
 
     "STATES_ABBREVIATION": {
         "AL": "Alabama",
@@ -143,7 +143,7 @@ const Controller = function(infoWindow){
     };
 
     const getTargetQuery = function(targetQuery){
-        const requestUrl = encodeURI(Config.URL_QUERY + 'getWonderTargetQuery?query=' + targetQuery);
+        const requestUrl = encodeURI(Config.URL_QUERY + '/getWonderTargetQuery?query=' + targetQuery);
         ajaxRequest(requestUrl);
     };
 
