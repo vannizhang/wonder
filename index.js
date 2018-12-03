@@ -3,6 +3,7 @@
 
 const Config = {
     "URL_GET_GOOGLE_AUTOCOMPLETE_DATA": "https://wonder.vannizhang.com/getData",
+    "URL_QUERY": "https://api.vannizhang.com/",
 
     "STATES_ABBREVIATION": {
         "AL": "Alabama",
@@ -69,7 +70,7 @@ const Controller = function(infoWindow){
 
         const requestUrl = Config.URL_GET_GOOGLE_AUTOCOMPLETE_DATA;
 
-        getJson(requestUrl, function(data){
+        ajaxRequest(requestUrl, function(data){
             
             if(!data.error){
                 setData(data);
@@ -111,7 +112,7 @@ const Controller = function(infoWindow){
         infoWindow.toggleIsSticky(isSticky);
     };
 
-    const getJson = function(url, callback){
+    const ajaxRequest = function(url, callback){
 
         const request = new XMLHttpRequest();
         request.open('GET', url, true);
@@ -119,11 +120,13 @@ const Controller = function(infoWindow){
         request.onload = function() {
             if (this.status >= 200 && this.status < 400) {
                 // Success!
-                const data = JSON.parse(this.response);
-                callback(data);
+                if(this.response && callback){
+                    const data = JSON.parse(this.response);
+                    callback(data);
+                }
+
             } else {
-                // We reached our target server, but it returned an error
-            
+                // console.error();
             }
         };
         
@@ -134,10 +137,22 @@ const Controller = function(infoWindow){
         request.send();
     };
 
+    const getSearchTerm = function(stateID){
+        const requestUrl = encodeURI(Config.URL_QUERY + '/getWonderSearchTerm?stateID=' + stateID);
+        ajaxRequest(requestUrl);
+    };
+
+    const getTargetQuery = function(targetQuery){
+        const requestUrl = encodeURI(Config.URL_QUERY + 'getWonderTargetQuery?query=' + targetQuery);
+        ajaxRequest(requestUrl);
+    };
+
     return {
         loadData: loadData,
         showInfoPanel: showInfoPanel,
         hideInfoPanel: hideInfoPanel,
+        getSearchTerm: getSearchTerm,
+        getTargetQuery: getTargetQuery,
         toggleStickInfoPanel: toggleStickInfoPanel
     };
 
@@ -215,6 +230,10 @@ const SvgMap = function(){
 
         setActiveHexPolygon(elementToSetAsActive);
         controller.toggleStickInfoPanel(isInfoWindowSticky);
+
+        if(elementToSetAsActive){
+            controller.getSearchTerm(element.id);
+        }
     };
 
     const setActiveHexPolygon = function(element){
@@ -247,15 +266,19 @@ const InfoWindow = function(options){
     options = options || {};
 
     let isInfoWindowSticky = false;
+    let controller = null;
 
     const $container = options.container ? document.getElementById(options.container) : null;
     const infoWindowOnCloseHandler = options.infoWindowOnCloseHandler || null;
 
-    const init = function(){
+    const init = function(appController){
+
         if(!$container){
             console.error('container DOM ID is required to init info panel');
             return;
         }
+
+        controller = appController;
     };
 
     const initEventHandler = function(){
@@ -280,6 +303,7 @@ const InfoWindow = function(options){
     const openGoogleSearchPage = function(q){
         q = q.replace(/\s/g, '+');
         const url = 'https://www.google.com/search?q=' + q;
+        controller.getTargetQuery(q);
         window.open(url, '_blank');
     }
 
@@ -361,32 +385,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     const appController = new Controller(infoWindow);
 
     appController.loadData(function(){
-        infoWindow.init();
+        infoWindow.init(appController);
         svgMap.init(appController);
     });
-
-
-    // window.foobar = ()=>{
-    //     const svg = document.getElementById('Layer1');
-    //     // console.log(svg.children.length);
-    //     // svg.children.forEach(d=>{
-    //     //     console.log(d);
-    //     // })
-
-    //     let targetPolygonID = '';
-
-    //     for(let i = 0, len = svg.children.length; i < len; i++){
-    //         if(svg.children[i].tagName === 'polygon'){
-    //             targetPolygonID = svg.children[i].id;
-    //         }
-
-    //         if(svg.children[i].tagName === 'text'){
-    //             svg.children[i].setAttribute('data-target', targetPolygonID);
-    //         }
-    //         // console.log(svg.children[i].tagName);
-    //     }
-
-    //     console.log(svg);
-    // }
 
 });
