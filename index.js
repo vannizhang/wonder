@@ -147,7 +147,8 @@ const SvgMap = function(){
 
     let controller = null;
 
-    const $polygons = document.querySelectorAll('polygon');
+    const $polygons = document.querySelectorAll('#Layer1 polygon');
+    const $labels = document.querySelectorAll('#Layer1 text');
     
     const init = function(appController){
         controller = appController;
@@ -181,9 +182,30 @@ const SvgMap = function(){
             const stateID = target.getAttribute('id');
             const enforceToShow = e.type === 'click' ? true : false;
             controller.showInfoPanel(stateID, x, enforceToShow);
+            updateTargetSvgElementStyle(stateID);
         } else {
             controller.hideInfoPanel();
+            updateTargetSvgElementStyle();
         }
+    };
+
+    const updateTargetSvgElementStyle = function(targetPolygonID){
+
+        $polygons.forEach(function(polygon){
+            if(polygon.id === targetPolygonID){
+                polygon.classList.add('is-hover');
+            } else {
+                polygon.classList.remove('is-hover');
+            }
+        });
+
+        $labels.forEach(function(label){
+            if(label.getAttribute('data-target') === targetPolygonID){
+                label.classList.add('is-hover');
+            } else {
+                label.classList.remove('is-hover');
+            }
+        });
     };
 
     const toggleActiveHexPolygon = function(element){
@@ -196,11 +218,20 @@ const SvgMap = function(){
     };
 
     const setActiveHexPolygon = function(element){
+
         $polygons.forEach(function(polygon){
             if(polygon === element){
                 polygon.classList.add('is-active');
             } else {
                 polygon.classList.remove('is-active');
+            }
+        });
+
+        $labels.forEach(function(label){
+            if(element && label.getAttribute('data-target') === element.id){
+                label.classList.add('is-active');
+            } else {
+                label.classList.remove('is-active');
             }
         });
     }
@@ -333,5 +364,29 @@ document.addEventListener("DOMContentLoaded", function(event) {
         infoWindow.init();
         svgMap.init(appController);
     });
+
+
+    // window.foobar = ()=>{
+    //     const svg = document.getElementById('Layer1');
+    //     // console.log(svg.children.length);
+    //     // svg.children.forEach(d=>{
+    //     //     console.log(d);
+    //     // })
+
+    //     let targetPolygonID = '';
+
+    //     for(let i = 0, len = svg.children.length; i < len; i++){
+    //         if(svg.children[i].tagName === 'polygon'){
+    //             targetPolygonID = svg.children[i].id;
+    //         }
+
+    //         if(svg.children[i].tagName === 'text'){
+    //             svg.children[i].setAttribute('data-target', targetPolygonID);
+    //         }
+    //         // console.log(svg.children[i].tagName);
+    //     }
+
+    //     console.log(svg);
+    // }
 
 });

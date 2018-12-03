@@ -6,12 +6,33 @@ body {
     font-family: 'Quicksand', sans-serif;
 }
 
+.svg-wrap{
+    position: relative;
+}
+
+.is-ref {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
 .is-rotated {
     transform: rotate(4deg); 
 }
 
-/* .is-blurred {
+.is-blurred {
     filter: blur(2px);
+}
+
+.is-visible-on-hover polygon,
+.is-visible-on-hover text{
+    opacity: 0;
+}
+
+/* .is-visible-on-hover polygon:hover{
+    opacity: 1;
 } */
 
 .cls-1{
@@ -20,10 +41,24 @@ body {
     stroke-miterlimit:10;
     cursor: pointer;
 }
-.cls-1.is-active,
-.cls-1:hover{
+
+[class^="cls"].is-hover {
+    opacity: 1;
+}
+
+polygon.is-hover {
     fill: url(#Gradient1);
 }
+
+polygon.is-active {
+    opacity: 1;
+    fill: url(#Gradient1);
+}
+
+text.is-active {
+    opacity: 1;
+}
+
 .cls-2,.cls-3,.cls-7{font-size:14px;font-family:ArialMT, Arial;}
 .cls-3,.cls-6{letter-spacing:-0.04em;}
 .cls-4{letter-spacing:-0.06em;}
