@@ -142,6 +142,13 @@ text.is-active {
     }
 }
 
+@media screen and (max-width: 480px) {
+    .header-wrap {
+        position: relative;
+    }
+
+}
+
 
 .cursor-pointer{
     cursor: pointer;

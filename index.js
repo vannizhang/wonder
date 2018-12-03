@@ -68,7 +68,7 @@ const Controller = function(infoWindow){
 
     const loadData = function(onSuccessHandler){
 
-        const requestUrl = Config.URL_GET_GOOGLE_AUTOCOMPLETE_DATA;
+        const requestUrl = Config.URL_GET_GOOGLE_AUTOCOMPLETE_DATA + '/?' + getRoundedDate(30);
 
         ajaxRequest(requestUrl, function(data){
             
@@ -145,6 +145,14 @@ const Controller = function(infoWindow){
     const getTargetQuery = function(targetQuery){
         const requestUrl = encodeURI(Config.URL_QUERY + '/getWonderTargetQuery?query=' + targetQuery);
         ajaxRequest(requestUrl);
+    };
+
+    const getRoundedDate = function(numOfMin){
+        numOfMin = numOfMin || 5;
+        const coeff = 1000 * 60 * numOfMin;
+        const date = new Date();  //or use any other date
+        const rounded = new Date(Math.floor(date.getTime() / coeff) * coeff).getTime();
+        return rounded / 1000;
     };
 
     return {
