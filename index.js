@@ -2,7 +2,7 @@
 "use strict";
 
 const Config = {
-    "URL_GET_GOOGLE_AUTOCOMPLETE_DATA": "https://wonder.vannizhang.com/getData",
+    "URL_GET_GOOGLE_AUTOCOMPLETE_DATA": "https://wonder.vannizhang.com/data.json",
     "URL_QUERY": "https://api.vannizhang.com",
 
     "STATES_ABBREVIATION": {
@@ -68,7 +68,7 @@ const Controller = function(infoWindow){
 
     const loadData = function(onSuccessHandler){
 
-        const requestUrl = Config.URL_GET_GOOGLE_AUTOCOMPLETE_DATA + '/?' + getRoundedDate(30);
+        const requestUrl = Config.URL_GET_GOOGLE_AUTOCOMPLETE_DATA + '/?' + getRoundedDate(5);
 
         ajaxRequest(requestUrl, function(data){
             
