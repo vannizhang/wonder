@@ -62,9 +62,31 @@ const Config = {
     }
 }
 
-const Controller = function(infoWindow){
+const Controller = function(){
 
     let googleAutoCompleteData = null;
+    let infoWindow = null;
+    let svgMap = null;
+
+    const hashDataManager  = new HashDataManager();
+
+    const init = function(options){
+        infoWindow = options.infoWindow || null;
+        svgMap = options.svgMap || null;
+
+        const hash = hashDataManager.getHashData();
+
+        if(hash){
+            showPreselectHex(hash);
+        }
+    };
+
+    const showPreselectHex = function(stateID){
+        const preselectHex = document.getElementById(stateID);
+        const rect = preselectHex.getBoundingClientRect();
+        showInfoPanel(stateID, rect.left);
+        svgMap.toggleActiveHexPolygon(preselectHex);
+    };
 
     const loadData = function(onSuccessHandler){
 
@@ -98,6 +120,7 @@ const Controller = function(infoWindow){
         if(shouldShow){
             const data = getDataByStateID(stateID);
             infoWindow.show(data, clientX);
+            hashDataManager.setHashData(stateID);
         }
     };
 
@@ -105,6 +128,7 @@ const Controller = function(infoWindow){
         // // hide if it's not sticky
         if( !infoWindow.isSticky() ){
             infoWindow.hide();
+            hashDataManager.setHashData();
         }
     };
 
@@ -156,6 +180,7 @@ const Controller = function(infoWindow){
     };
 
     return {
+        init: init,
         loadData: loadData,
         showInfoPanel: showInfoPanel,
         hideInfoPanel: hideInfoPanel,
@@ -265,7 +290,8 @@ const SvgMap = function(){
 
     return {
         init: init,
-        setActiveHexPolygon: setActiveHexPolygon
+        setActiveHexPolygon: setActiveHexPolygon,
+        toggleActiveHexPolygon: toggleActiveHexPolygon
     };
 };
 
@@ -378,8 +404,28 @@ const InfoWindow = function(options){
     };
 };
 
+const HashDataManager = function(){
+
+    const getHashData = ()=>{
+        const hash = window.location.hash;
+        return hash ? hash.substring(1) : null;
+    };
+
+    const setHashData = (value='')=>{
+        window.location.hash = value;
+    };
+
+    return {
+        getHashData,
+        setHashData
+    };
+
+}
+
 // init app
 document.addEventListener("DOMContentLoaded", function(event) { 
+
+    const appController = new Controller();
 
     const svgMap = new SvgMap();
     
@@ -387,14 +433,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
         container: 'infoWindowDiv',
         infoWindowOnCloseHandler: function(){
             svgMap.setActiveHexPolygon(null);
+            appController.hideInfoPanel();
         }
     });
     
-    const appController = new Controller(infoWindow);
-
     appController.loadData(function(){
+
         infoWindow.init(appController);
+
         svgMap.init(appController);
+
+        appController.init({
+            infoWindow,
+            svgMap
+        });
+
     });
 
 });
