@@ -68,7 +68,7 @@ const Controller = function(infoWindow){
 
     const loadData = function(onSuccessHandler){
 
-        const requestUrl = Config.URL_GET_GOOGLE_AUTOCOMPLETE_DATA + '/?' + getRoundedDate(5);
+        const requestUrl = Config.URL_GET_GOOGLE_AUTOCOMPLETE_DATA + '?' + getRoundedDate(5);
 
         ajaxRequest(requestUrl, function(data){
             
