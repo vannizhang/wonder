@@ -14,7 +14,7 @@ const Config = {
         "CO": "Colorado",
         "CT": "Connecticut",
         "DE": "Delaware",
-        "DC": "DC",
+        "DC": "Washington DC",
         "FL": "Florida",
         "GA": "Georgia",
         "GU": "Guam",
