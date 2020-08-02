@@ -2,7 +2,7 @@
 "use strict";
 
 const Config = {
-    "URL_GET_GOOGLE_AUTOCOMPLETE_DATA": "https://wonder.vannizhang.com/data.json",
+    "URL_GET_GOOGLE_AUTOCOMPLETE_DATA": "https://static.vannizhang.com/wonder/data.json",
     "URL_QUERY": "https://api.vannizhang.com",
 
     "STATES_ABBREVIATION": {
