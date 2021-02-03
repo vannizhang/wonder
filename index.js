@@ -161,15 +161,15 @@ const Controller = function(){
         request.send();
     };
 
-    const getSearchTerm = function(stateID){
-        const requestUrl = encodeURI(Config.URL_QUERY + '/getWonderSearchTerm?stateID=' + stateID);
-        ajaxRequest(requestUrl);
-    };
+    // const getSearchTerm = function(stateID){
+    //     const requestUrl = encodeURI(Config.URL_QUERY + '/getWonderSearchTerm?stateID=' + stateID);
+    //     ajaxRequest(requestUrl);
+    // };
 
-    const getTargetQuery = function(targetQuery){
-        const requestUrl = encodeURI(Config.URL_QUERY + '/getWonderTargetQuery?query=' + targetQuery);
-        ajaxRequest(requestUrl);
-    };
+    // const getTargetQuery = function(targetQuery){
+    //     const requestUrl = encodeURI(Config.URL_QUERY + '/getWonderTargetQuery?query=' + targetQuery);
+    //     ajaxRequest(requestUrl);
+    // };
 
     const getRoundedDate = function(numOfMin){
         numOfMin = numOfMin || 5;
@@ -184,8 +184,8 @@ const Controller = function(){
         loadData: loadData,
         showInfoPanel: showInfoPanel,
         hideInfoPanel: hideInfoPanel,
-        getSearchTerm: getSearchTerm,
-        getTargetQuery: getTargetQuery,
+        // getSearchTerm: getSearchTerm,
+        // getTargetQuery: getTargetQuery,
         toggleStickInfoPanel: toggleStickInfoPanel
     };
 
@@ -264,9 +264,9 @@ const SvgMap = function(){
         setActiveHexPolygon(elementToSetAsActive);
         controller.toggleStickInfoPanel(isInfoWindowSticky);
 
-        if(elementToSetAsActive){
-            controller.getSearchTerm(element.id);
-        }
+        // if(elementToSetAsActive){
+        //     controller.getSearchTerm(element.id);
+        // }
     };
 
     const setActiveHexPolygon = function(element){
@@ -337,7 +337,7 @@ const InfoWindow = function(options){
     const openGoogleSearchPage = function(q){
         q = q.replace(/\s/g, '+');
         const url = 'https://www.google.com/search?q=' + q;
-        controller.getTargetQuery(q);
+        // controller.getTargetQuery(q);
         window.open(url, '_blank');
     }
 
